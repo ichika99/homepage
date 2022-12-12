@@ -46,7 +46,7 @@ body.addEventListener('mousemove', (e) => {
 window.addEventListener('load', function () {
 
     //载入动画
-    $('#loading-box').attr('class', 'loaded');
+    document.getElementById('loading').classList.add('loaded')
     $('#bg').css("cssText", "transform: scale(1);filter: blur(0px);transition: ease 1.5s;");
     $('.cover').css("cssText", "opacity: 1;transition: ease 1.5s;");
     $('#section').css("cssText", "transform: scale(1) !important;opacity: 1 !important;filter: blur(0px) !important");
@@ -61,20 +61,6 @@ window.addEventListener('load', function () {
         });
     }, 800);
 
-    //延迟加载音乐播放器
-    let element = document.createElement("script");
-    element.src = "./js/music.js";
-    document.body.appendChild(element);
-
-    //中文字体缓加载-此处写入字体源文件 （暂时弃用）
-    //先行加载简体中文子集，后续补全字集
-    //由于压缩过后的中文字体仍旧过大，可转移至对象存储或 CDN 加载
-    // const font = new FontFace(
-    //     "MiSans",
-    //     "url(" + "./font/MiSans-Regular.woff2" + ")"
-    // );
-    // document.fonts.add(font);
-
     //移动端去除鼠标样式
     if (Boolean(window.navigator.userAgent.match(/AppWebKit.*Mobile.*/))) {
         $('#g-pointer-2').css("display", "none");
@@ -82,24 +68,8 @@ window.addEventListener('load', function () {
 
 }, false)
 
-setTimeout(function () {
-    $('#loading-text').html("字体及文件加载可能需要一定时间")
-}, 3000);
-
-// 新春灯笼 （ 需要时可取消注释 ）
-// new_element=document.createElement("link");
-// new_element.setAttribute("rel","stylesheet");
-// new_element.setAttribute("type","text/css");
-// new_element.setAttribute("href","./css/lantern.css");
-// document.body.appendChild(new_element);
-
-// new_element=document.createElement("script");
-// new_element.setAttribute("type","text/javascript");
-// new_element.setAttribute("src","./js/lantern.js");
-// document.body.appendChild(new_element);
-
 //获取一言
-fetch('https://v1.hitokoto.cn?max_length=24')
+fetch('https://v1.hitokoto.cn?max_length=24&c=a&c=b&c=c&c=i&c=h&c=l')
     .then(response => response.json())
     .then(data => {
         $('#hitokoto_text').html(data.hitokoto)
@@ -134,33 +104,35 @@ $('#hitokoto').click(function () {
 });
 
 //获取天气
-//请前往 https://www.mxnzp.com/doc/list 申请 app_id 和 app_secret
+//请前往 https://lbs.qq.com/ 申请 qmapkey
 //请前往 https://dev.qweather.com/ 申请 key
-const add_id = "wrknltonr0foslhs"; // app_id
-const app_secret = "Nlh1c0F6d0ZDU2pDR0J3YVBVbkhudz09"; // app_secret
-const key = "433f0c48615a48dfaf2f2b2444297e79" // key
-function getWeather() {
-    fetch("https://www.mxnzp.com/api/ip/self?app_id=" + add_id + "&app_secret=" + app_secret)
-        .then(response => response.json())
-        .then(data => {
-            let str = data.data.city
+const qmapkey= "T3EBZ-TJ7LI-YRBG2-5ZLUR-KD3OS-U6BJO" //qmapkey
+const key = "2f9465ca9cef44a98c60dd3fd639d1f9" // key
+function getWeather () {
+    $.ajax({
+        type: 'get',
+        url: 'https://apis.map.qq.com/ws/location/v1/ip',
+        data: {
+            key: qmapkey,
+            output: 'jsonp',
+        },
+        dataType: 'jsonp',
+        success: function (data) {
+            let str = data.result.ad_info.city
             let city = str.replace(/市/g, '')
             $('#city_text').html(city);
-            fetch("https://geoapi.qweather.com/v2/city/lookup?location=" + city + "&number=1&key=" + key)
+            fetch("https://devapi.qweather.com/v7/weather/now?location=" + data.result.location.lng + ',' + data.result.location.lat + "&key=" + key)
                 .then(response => response.json())
-                .then(location => {
-                    let id = location.location[0].id
-                    fetch("https://devapi.qweather.com/v7/weather/now?location=" + id + "&key=" + key)
-                        .then(response => response.json())
-                        .then(weather => {
-                            $('#wea_text').html(weather.now.text)
-                            $('#tem_text').html(weather.now.temp + "°C&nbsp;")
-                            $('#win_text').html(weather.now.windDir)
-                            $('#win_speed').html(weather.now.windScale + "级")
-                        })
+                .then(weather => {
+                    $('#wea_text').html(weather.now.text)
+                    $('#tem_text').html(weather.now.temp + "°C&nbsp;")
+                    $('#win_text').html(weather.now.windDir)
+                    $('#win_speed').html(weather.now.windScale + "级")
                 })
-        })
-        .catch(console.error);
+                
+        }
+    })
+    .catch(console.error);
 }
 
 getWeather();
@@ -240,57 +212,33 @@ $("#social").mouseover(function () {
 });
 
 $("#github").mouseover(function () {
-    $("#link-text").html("去 Github 看看");
+    $("#link-text").html("Github");
 }).mouseout(function () {
-    $("#link-text").html("通过这里联系我");
+    $("#link-text").html("");
 });
 $("#qq").mouseover(function () {
-    $("#link-text").html("有什么事吗");
+    $("#link-text").html("QQ");
 }).mouseout(function () {
-    $("#link-text").html("通过这里联系我");
+    $("#link-text").html("");
 });
 $("#email").mouseover(function () {
-    $("#link-text").html("来封 Email");
+    $("#link-text").html("Email");
 }).mouseout(function () {
-    $("#link-text").html("通过这里联系我");
+    $("#link-text").html("");
 });
 $("#bilibili").mouseover(function () {
-    $("#link-text").html("来 B 站看看 ~");
+    $("#link-text").html("bilibili");
 }).mouseout(function () {
-    $("#link-text").html("通过这里联系我");
+    $("#link-text").html("");
 });
 $("#telegram").mouseover(function () {
-    $("#link-text").html("你懂的 ~");
+    $("#link-text").html("telegram");
 }).mouseout(function () {
-    $("#link-text").html("通过这里联系我");
+    $("#link-text").html("");
 });
 
-//自动变灰
-let myDate = new Date;
-let mon = myDate.getMonth() + 1;
-let date = myDate.getDate();
-let days = ['4.4', '5.12', '7.7', '9.9', '9.18', '12.13'];
-for (let day of days) {
-    let d = day.split('.');
-    if (mon == d[0] && date == d[1]) {
-        document.write(
-            '<style>html{-webkit-filter:grayscale(100%);-moz-filter:grayscale(100%);-ms-filter:grayscale(100%);-o-filter:grayscale(100%);filter:progid:DXImageTransform.Microsoft.BasicImage(grayscale=1);_filter:none}</style>'
-        );
-        $("#change").html("Silence&nbsp;in&nbsp;silence");
-        $("#change1").html("今天是中国国家纪念日，全站已切换为黑白模式");
-        window.addEventListener('load', function () {
-            setTimeout(function () {
-                iziToast.show({
-                    timeout: 14000,
-                    icon: "fa-solid fa-clock",
-                    message: '今天是中国国家纪念日'
-                });
-            }, 3800);
-        }, false);
-    }
-}
 
-//更多页面切换
+/*更多页面切换
 let shoemore = false;
 $('#switchmore').on('click', function () {
     shoemore = !shoemore;
@@ -309,6 +257,14 @@ $('#switchmore').on('click', function () {
 $('#close').on('click', function () {
     $('#switchmore').click();
 });
+
+//更多页面显示关闭按钮
+$("#more").hover(function () {
+    $('#close').css("display", "block");
+}, function () {
+    $('#close').css("display", "none");
+})
+*/
 
 //移动端菜单栏切换
 let switchmenu = false;
@@ -371,12 +327,7 @@ $('#changemore').on('click', function () {
     }
 });
 
-//更多页面显示关闭按钮
-$("#more").hover(function () {
-    $('#close').css("display", "block");
-}, function () {
-    $('#close').css("display", "none");
-})
+
 
 //屏蔽右键
 document.oncontextmenu = function () {
@@ -391,32 +342,27 @@ document.oncontextmenu = function () {
 //控制台输出
 //console.clear();
 let styleTitle1 = `
-font-size: 20px;
+font-size: 15px;
 font-weight: 600;
 color: rgb(244,167,89);
 `
 let styleTitle2 = `
 font-size:12px;
-color: rgb(244,167,89);
-`
-let styleContent = `
 color: rgb(30,152,255);
 `
-let title1 = '無名の主页'
+let title1 = '这里是ichika，欢迎来访'
 let title2 = `
- _____ __  __  _______     ____     __
-|_   _|  \\/  |/ ____\\ \\   / /\\ \\   / /
-  | | | \\  / | (___  \\ \\_/ /  \\ \\_/ / 
-  | | | |\\/| |\\___ \\  \\   /    \\   /  
- _| |_| |  | |____) |  | |      | |   
-|_____|_|  |_|_____/   |_|      |_|                                                     
+ _      _     _ _                              
+(_)    | |   (_) |          _                  
+ _  ___| |__  _| | ____ _  (_)                 
+| |/ __| '_ \\| | |/ / _\` |                     
+| | (__| | | | |   < (_| |  _                  
+|_|\\___|_| |_|_|_|\\_\\__,_| (_)               _ 
+\\ \\        / / | |                          | |
+ \\ \\  /\\  / /__| | ___ ___  _ __ ___   ___  | |
+  \\ \\/  \\/ / _ \\ |/ __/ _ \\| '_ \` _ \\ / _ \\ | |
+   \\  /\\  /  __/ | (_| (_) | | | | | |  __/ |_|
+    \\/  \\/ \\___|_|\\___\\___/|_| |_| |_|\\___| (_)                                                 
 `
-let content = `
-版 本 号：3.4
-更新日期：2022-07-24
 
-主页:  https://www.imsyy.top
-Github:  https://github.com/imsyy/home
-`
-console.log(`%c${title1} %c${title2}
-%c${content}`, styleTitle1, styleTitle2, styleContent)
+console.log(`%c${title1} %c${title2}`, styleTitle1, styleTitle2)
