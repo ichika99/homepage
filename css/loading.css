@@ -59,11 +59,11 @@
     width: 9rem;
     height: 9rem;
     object-fit: cover;
-    animation: fade 1.8s linear infinite; 
+    animation: loadfade 1.8s linear infinite; 
     z-index: 5;
 }
 
-@keyframes fade{
+@keyframes loadfade{
     0%{
         opacity: 1;
     }
