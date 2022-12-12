@@ -1,0 +1,30 @@
+# 当有改动推送到master分支时，启动Action
+name: 自动部署
+
+on:
+  push:
+    branches:
+      - master #2020年10月后github新建仓库默认分支改为main，注意更改
+
+  release:
+    types:
+      - published
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 检查分支
+      uses: actions/checkout@v2
+      with:
+        ref: master #2020年10月后github新建仓库默认分支改为main，注意更改
+
+    - name: 部署至服务器
+      uses: appleboy/scp-action@master
+      with:
+        source: '*'
+        host: ${{ secrets.SERVER_IP }}
+        target: '/www/wwwroot/homepage'
+        port: 22
+        username: 'root'
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
